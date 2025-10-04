@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PetCare Express</string>
+    <string name="pet_food_portioning">Pet Food Portioning</string>
+    <string name="grams">%.1f grams</string>
+    <string name="pet_food_brand">Pet Food Brand</string>
+    <string name="pet_weight_kg">Pet Weight (kg):</string>
+    <string name="enter_pet_weight_in_kilograms">Enter pet weight in kilograms</string>
+</resources>
