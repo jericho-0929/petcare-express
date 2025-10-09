@@ -42,11 +42,7 @@
             android:id="@+id/serving_per_meal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-<<<<<<< HEAD
-            android:text="@string/_1f_grams_per_meal"
-=======
             android:text="@string/grams_per_meal"
->>>>>>> b67d0a2 (Extract sub-class foodFormula to own class file. Add measurement for per-meal feature.)
             />
     </LinearLayout>
 
