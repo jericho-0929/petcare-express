@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">PetCare Express</string>
     <string name="pet_food_portioning">Pet Food Portioning</string>
-    <string name="grams">%.1f grams</string>
+    <string name="grams">%.1f grams in total</string>
     <string name="pet_food_brand">Pet Food Brand</string>
     <string name="pet_weight_kg">Pet Weight (kg):</string>
     <string name="enter_pet_weight_in_kilograms">Enter pet weight in kilograms</string>
+    <string name="_2">2</string>
+    <string name="enter_amount_of_meals_per_day">Enter amount of meals per day</string>
+    <string name="amount_of_meals_per_day">Amount of meals (per day)</string>
+    <string name="_1f_grams_per_meal">%.1f grams per meal</string>
 </resources>

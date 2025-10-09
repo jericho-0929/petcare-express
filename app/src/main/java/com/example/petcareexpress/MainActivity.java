@@ -13,12 +13,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.util.Locale;
+import com.example.petcareexpress.objects.FoodFormula;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    EditText inputPetWeightText;
-    TextView petWeightText, petFoodBrandText, servingWeightText;
+    EditText inputPetWeightText, inputMealAmount;
+    TextView petWeightText, petFoodBrandText, servingWeightText, mealWeightText;
     FoodFormula foodFormula;
     private final TextWatcher inputPetWeightWatcher = new TextWatcher() {
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -30,19 +30,27 @@ public class MainActivity extends AppCompatActivity {
         public void afterTextChanged(Editable s) {
             String textValue = s.toString();
             try {
-                double doubleValue = Double.parseDouble(textValue);
-                double returnValue = foodFormula.recommendedServing * doubleValue;
-
-                Log.d(TAG, "Received user-input for inputPetWeightText: " + doubleValue);
-
-                servingWeightText.setText(getString(R.string.grams, returnValue));
+                setServingWeightText(textValue);
 
             } catch (NumberFormatException e) {
                 Log.e(TAG, "NumberFormatException: Input is not string.");
             }
         }
     };
+    private void setMealWeightText(String textValue) {
+        double doubleValue = Double.parseDouble(textValue);
+        double mealWeight = Double.parseDouble(servingWeightText.getText().toString()) / doubleValue;
 
+        mealWeightText.setText();
+    }
+    private void setServingWeightText(String textValue) {
+        double doubleValue = Double.parseDouble(textValue);
+        double returnValue = foodFormula.getRecommendedServing() * doubleValue;
+
+        Log.d(TAG, "Received user-input for inputPetWeightText: " + doubleValue);
+
+        servingWeightText.setText(getString(R.string.grams, returnValue));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Activity Initialization
@@ -57,34 +65,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Variables
         inputPetWeightText = findViewById(R.id.input_pet_weight);
+        inputMealAmount = findViewById(R.id.input_meal_amount);
+
         petWeightText = findViewById(R.id.pet_weight);
         petFoodBrandText = findViewById(R.id.pet_food_brand);
         servingWeightText = findViewById(R.id.serving_weight);
+        mealWeightText = findViewById(R.id.meal_per_day_amount);
+
         foodFormula = new FoodFormula();
 
         // Set TextChange Listener
         inputPetWeightText.addTextChangedListener(inputPetWeightWatcher);
-    }
-}
 
-class FoodFormula {
-    String name;
-    double minimumPetWeight;
-    double minimumFeedingAmount;
-    double recommendedServing;
-    public FoodFormula() {
-        this.name = "SmartHeart Cat Food";
-        this.minimumPetWeight = 2.0;
-        this.minimumFeedingAmount = 40;
-        this.recommendedServing = getRecommendedServing();
-    }
-    public FoodFormula(String name, double minimumPetWeight, double minimumFeedingAmount) {
-        this.name = name;
-        this.minimumPetWeight = minimumPetWeight;
-        this.minimumFeedingAmount = minimumFeedingAmount;
-        this.recommendedServing = getRecommendedServing();
-    }
-    public double getRecommendedServing() {
-        return minimumFeedingAmount / minimumPetWeight;
+        // Initialize default values
+        petFoodBrandText.setText(foodFormula.name);
+        setServingWeightText(inputPetWeightText.getText().toString());
     }
 }
