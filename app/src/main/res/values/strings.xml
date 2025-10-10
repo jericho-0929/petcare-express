@@ -9,4 +9,6 @@
     <string name="enter_amount_of_meals_per_day">Enter amount of meals per day</string>
     <string name="amount_of_meals_per_day">Amount of meals (per day)</string>
     <string name="grams_per_meal">%.1f grams per meal</string>
+    <string name="select_food">Select Food</string>
+    <string name="add_item">Add Item</string>
 </resources>

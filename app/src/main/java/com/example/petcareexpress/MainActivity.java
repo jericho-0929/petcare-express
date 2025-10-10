@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,8 +20,10 @@ import com.example.petcareexpress.objects.FoodFormula;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private static final String BUTTON_TAG = "Buttons";
     EditText inputPetWeightText, inputMealAmount;
     TextView petWeightText, petFoodBrandText, servingWeightOutput, mealWeightText, servingPerMealOutput;
+    Button selectFoodButton, addItemButton;
     FoodFormula foodFormula;
     double servingWeight = 0;
     @Override
@@ -43,10 +48,60 @@ public class MainActivity extends AppCompatActivity {
         // Output-to-user UI elements
         servingWeightOutput = findViewById(R.id.serving_weight);
         servingPerMealOutput = findViewById(R.id.serving_per_meal);
+        // Buttons
+        selectFoodButton = findViewById(R.id.select_food_button);
+        addItemButton = findViewById(R.id.add_item_button);
 
         // Add TextChange Listeners
-        inputPetWeightText.addTextChangedListener(inputPetWeightWatcher);
-        inputMealAmount.addTextChangedListener(inputMealAmountWatcher);
+        inputPetWeightText.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                Log.v(TAG, "inputPetWeightWatcher stand-by.");
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.v(TAG, "inputPetWeightWatcher receiving input.");
+            }
+
+            public void afterTextChanged(Editable s) {
+                String textValue = s.toString();
+                try {
+                    setServingWeightOutput(textValue);
+                    setMealWeightText(inputMealAmount.getText().toString());
+
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "NumberFormatException: Input is not string.");
+                }
+            }
+        });
+        inputMealAmount.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String textValue = s.toString();
+                    try {
+                        setMealWeightText(textValue);
+                    } catch (NumberFormatException e) {
+                        Log.e(TAG, "NumberFormatException: Input is not string.");
+                    }
+                }
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    Log.v(TAG, "inputMealAmountWatcher stand-by.");
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Log.v(TAG, "inputMealAmountWatcher receiving input.");
+                }
+            });
+        // Add onClick Listeners
+        selectFoodButton.setOnClickListener(v -> {
+            Log.d(BUTTON_TAG, "Select Food Button pressed");
+            showShortToast("Feature: 'Select Food' not implemented yet.");
+        });
+        addItemButton.setOnClickListener(v -> {
+            Log.d(BUTTON_TAG, "Add Item Button pressed");
+            new AddItemDialog().show(getSupportFragmentManager(), "ADD_ITEM");
+        });
+
         // Initialize classes
         foodFormula = new FoodFormula();
         // Initialize default values
@@ -54,43 +109,9 @@ public class MainActivity extends AppCompatActivity {
         setServingWeightOutput(inputPetWeightText.getText().toString());
         setMealWeightText(inputMealAmount.getText().toString());
     }
-    private final TextWatcher inputPetWeightWatcher = new TextWatcher() {
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.v(TAG, "inputPetWeightWatcher stand-by.");
-        }
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Log.v(TAG, "inputPetWeightWatcher receiving input.");
-        }
-        public void afterTextChanged(Editable s) {
-            String textValue = s.toString();
-            try {
-                setServingWeightOutput(textValue);
-                setMealWeightText(inputMealAmount.getText().toString());
-
-            } catch (NumberFormatException e) {
-                Log.e(TAG, "NumberFormatException: Input is not string.");
-            }
-        }
-    };
-    private final TextWatcher inputMealAmountWatcher = new TextWatcher() {
-        @Override
-        public void afterTextChanged(Editable s) {
-            String textValue = s.toString();
-            try {
-                setMealWeightText(textValue);
-            } catch (NumberFormatException e) {
-                Log.e(TAG, "NumberFormatException: Input is not string.");
-            }
-        }
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.v(TAG, "inputMealAmountWatcher stand-by.");
-        }
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            Log.v(TAG, "inputMealAmountWatcher receiving input.");
-        }
-    };
+    private void showShortToast(String string) {
+        Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
+    }
     private void setMealWeightText(String textValue) {
         double doubleValue = Double.parseDouble(textValue);
         double mealWeight = servingWeight / doubleValue;
@@ -105,6 +126,4 @@ public class MainActivity extends AppCompatActivity {
 
         servingWeightOutput.setText(getString(R.string.grams, servingWeight));
     }
-
-    // Nothing
 }
