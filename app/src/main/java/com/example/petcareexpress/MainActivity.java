@@ -1,5 +1,6 @@
 package com.example.petcareexpress;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +22,7 @@ import com.example.petcareexpress.objects.FoodFormula;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String BUTTON_TAG = "Buttons";
+    private DBHelper dbHelper;
     EditText inputPetWeightText, inputMealAmount;
     TextView petWeightText, petFoodBrandText, servingWeightOutput, mealWeightText, servingPerMealOutput;
     Button selectFoodButton, addItemButton;
@@ -37,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        // Initialize DBHelper
+        dbHelper = new DBHelper(this);
         // Assign variables to equivalent in UI
         petWeightText = findViewById(R.id.pet_weight);
         petFoodBrandText = findViewById(R.id.pet_food_brand);
@@ -51,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         // Buttons
         selectFoodButton = findViewById(R.id.select_food_button);
         addItemButton = findViewById(R.id.add_item_button);
+
+        // TODO: Remove once proper database handling is implemented.
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // Add TextChange Listeners
         inputPetWeightText.addTextChangedListener(new TextWatcher() {
@@ -105,9 +111,12 @@ public class MainActivity extends AppCompatActivity {
         // Initialize classes
         foodFormula = new FoodFormula();
         // Initialize default values
+        // TODO: Change to use database.
         petFoodBrandText.setText(foodFormula.name);
         setServingWeightOutput(inputPetWeightText.getText().toString());
         setMealWeightText(inputMealAmount.getText().toString());
+
+        Log.d(TAG, "onCreate() finished.");
     }
     private void showShortToast(String string) {
         Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
@@ -125,5 +134,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Received user-input for inputPetWeightText: " + doubleValue);
 
         servingWeightOutput.setText(getString(R.string.grams, servingWeight));
+    }
+    protected void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
     }
 }
