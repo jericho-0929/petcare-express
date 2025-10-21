@@ -1,11 +1,11 @@
 package com.example.petcareexpress;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     Button selectFoodButton, addItemButton;
     FoodFormula foodFormula;
     double servingWeight = 0;
+    Cursor dbCursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Activity Initialization
@@ -54,9 +55,6 @@ public class MainActivity extends AppCompatActivity {
         // Buttons
         selectFoodButton = findViewById(R.id.select_food_button);
         addItemButton = findViewById(R.id.add_item_button);
-
-        // TODO: Remove once proper database handling is implemented.
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // Add TextChange Listeners
         inputPetWeightText.addTextChangedListener(new TextWatcher() {
@@ -108,10 +106,18 @@ public class MainActivity extends AppCompatActivity {
             new AddItemDialog().show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
+        // TODO: Refactor to own method.
+        // Get first entry in foodDatabase.
+        dbCursor =  getCursorFromID(1);
+        dbCursor.moveToFirst();
         // Initialize classes
-        foodFormula = new FoodFormula();
+        foodFormula = new FoodFormula(
+                dbCursor.getString(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_BRAND_NAME)),
+                dbCursor.getString(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_FOOD_TYPE)),
+                dbCursor.getDouble(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_MIN_PET_WEIGHT)),
+                dbCursor.getDouble(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_MIN_FEED_AMOUNT))
+                );
         // Initialize default values
-        // TODO: Change to use database.
         petFoodBrandText.setText(foodFormula.name);
         setServingWeightOutput(inputPetWeightText.getText().toString());
         setMealWeightText(inputMealAmount.getText().toString());
@@ -134,6 +140,21 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Received user-input for inputPetWeightText: " + doubleValue);
 
         servingWeightOutput.setText(getString(R.string.grams, servingWeight));
+    }
+    private Cursor getCursorFromID(Integer id) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(
+                DBContract.FoodTable.TABLE_NAME,
+                null,
+                DBContract.FoodTable.COLUMN_ID + " = ?",
+                new String[] {String.valueOf(id)},
+                null,
+                null,
+                null
+        );
+        // TODO: Uncomment.
+        // db.close();
+        return cursor;
     }
     protected void onDestroy() {
         dbHelper.close();
