@@ -3,6 +3,7 @@ package com.example.petcareexpress;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -95,6 +96,12 @@ public class AddItemDialog extends DialogFragment {
             return false;
         }
         return true;
+    }
+    public void onDismiss(@NonNull DialogInterface dialog){
+        Log.d(TAG, "Dialog dismissed.");
+
+        super.onDismiss(dialog);
+        dbHelper.close();
     }
 }
 

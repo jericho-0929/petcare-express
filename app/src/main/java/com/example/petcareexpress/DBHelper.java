@@ -1,13 +1,10 @@
 package com.example.petcareexpress;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.util.Log;
-
-import com.example.petcareexpress.objects.FoodFormula;
 
 // Handles SQLite creation and updates.
 public class DBHelper extends SQLiteOpenHelper {
@@ -30,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
             DBContract.FoodTable.COLUMN_MIN_PET_WEIGHT + ", " +
             DBContract.FoodTable.COLUMN_MIN_FEED_AMOUNT + ") VALUES (" +
             "'Generic Cat Dry Food', " +
-            "'Dry', " +
+            "'Dry Food', " +
             + 2.0 + ", " +
             + 40 + ");";
     public DBHelper(Context context) {

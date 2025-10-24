@@ -1,5 +1,6 @@
 package com.example.petcareexpress;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -12,21 +13,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.petcareexpress.objects.FoodFormula;
+import com.example.petcareexpress.objects.FoodData;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String BUTTON_TAG = "Buttons";
+    private ActivityResultLauncher<Intent> getFoodItemActivity;
     private DBHelper dbHelper;
     EditText inputPetWeightText, inputMealAmount;
-    TextView petWeightText, petFoodBrandText, servingWeightOutput, mealWeightText, servingPerMealOutput;
+    TextView petWeightText, petFoodBrandText, petFoodTypeText,
+            servingWeightOutput, mealWeightText, servingPerMealOutput;
     Button selectFoodButton, addItemButton;
-    FoodFormula foodFormula;
+    FoodData foodData;
     double servingWeight = 0;
     Cursor dbCursor;
     @Override
@@ -45,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         // Assign variables to equivalent in UI
         petWeightText = findViewById(R.id.pet_weight);
         petFoodBrandText = findViewById(R.id.pet_food_brand);
+        petFoodTypeText = findViewById(R.id.pet_food_type);
         mealWeightText = findViewById(R.id.meal_per_day_amount);
         // User-input guide UI elements
         inputPetWeightText = findViewById(R.id.input_pet_weight);
@@ -55,6 +63,20 @@ public class MainActivity extends AppCompatActivity {
         // Buttons
         selectFoodButton = findViewById(R.id.select_food_button);
         addItemButton = findViewById(R.id.add_item_button);
+
+        // Initialize ActivityResultLaunchers
+        getFoodItemActivity = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == MainActivity.RESULT_OK) {
+                        Intent data = result.getData();
+                        assert data != null;
+                        foodData = data.getParcelableExtra("selectedFoodData");
+                        // TODO: Parse to FoodData.
+                    } else if (result.getResultCode() == MainActivity.RESULT_CANCELED) {
+                        showShortToast("No item selected.");
+                    }
+                });
 
         // Add TextChange Listeners
         inputPetWeightText.addTextChangedListener(new TextWatcher() {
@@ -98,33 +120,26 @@ public class MainActivity extends AppCompatActivity {
             });
         // Add onClick Listeners
         selectFoodButton.setOnClickListener(v -> {
-            Log.d(BUTTON_TAG, "Select Food Button pressed");
-            showShortToast("Feature: 'Select Food' not implemented yet.");
+            // showShortToast("Feature: 'Select Food' not implemented yet.");
+            // new SelectItemDialog().show(getSupportFragmentManager(), "SELECT_ITEM");
+
+            Intent intent = new Intent(MainActivity.this, SelectItemActivity.class);
+            getFoodItemActivity.launch(intent);
         });
         addItemButton.setOnClickListener(v -> {
-            Log.d(BUTTON_TAG, "Add Item Button pressed");
             new AddItemDialog().show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
-        // TODO: Refactor to own method.
-        // Get first entry in foodDatabase.
-        dbCursor =  getCursorFromID(1);
-        dbCursor.moveToFirst();
-        // Initialize classes
-        foodFormula = new FoodFormula(
-                dbCursor.getString(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_BRAND_NAME)),
-                dbCursor.getString(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_FOOD_TYPE)),
-                dbCursor.getDouble(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_MIN_PET_WEIGHT)),
-                dbCursor.getDouble(dbCursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_MIN_FEED_AMOUNT))
-                );
         // Initialize default values
-        petFoodBrandText.setText(foodFormula.name);
+        foodData = constructFoodFormula();
+        petFoodBrandText.setText(foodData.name);
+        petFoodTypeText.setText(foodData.foodType);
         setServingWeightOutput(inputPetWeightText.getText().toString());
         setMealWeightText(inputMealAmount.getText().toString());
 
         Log.d(TAG, "onCreate() finished.");
     }
-    private void showShortToast(String string) {
+    public void showShortToast(String string) {
         Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
     }
     private void setMealWeightText(String textValue) {
@@ -135,26 +150,34 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setServingWeightOutput(String textValue) {
         double doubleValue = Double.parseDouble(textValue);
-        servingWeight = foodFormula.getRecommendedServing() * doubleValue;
+        servingWeight = foodData.getRecommendedServing() * doubleValue;
 
         Log.d(TAG, "Received user-input for inputPetWeightText: " + doubleValue);
 
         servingWeightOutput.setText(getString(R.string.grams, servingWeight));
     }
-    private Cursor getCursorFromID(Integer id) {
+    private FoodData constructFoodFormula() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(
                 DBContract.FoodTable.TABLE_NAME,
                 null,
                 DBContract.FoodTable.COLUMN_ID + " = ?",
-                new String[] {String.valueOf(id)},
+                new String[] {String.valueOf(1)},
                 null,
                 null,
                 null
         );
-        // TODO: Uncomment.
-        // db.close();
-        return cursor;
+        // Get first entry in foodDatabase.
+        cursor.moveToFirst();
+        // Initialize classes
+        FoodData foodData = new FoodData(
+                cursor.getString(cursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_BRAND_NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_FOOD_TYPE)),
+                cursor.getDouble(cursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_MIN_PET_WEIGHT)),
+                cursor.getDouble(cursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_MIN_FEED_AMOUNT))
+        );
+        cursor.close();
+        return foodData;
     }
     protected void onDestroy() {
         dbHelper.close();
