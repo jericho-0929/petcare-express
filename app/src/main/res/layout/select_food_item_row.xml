@@ -4,35 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical">
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginVertical="10dp"
-        tools:ignore="UselessParent">
-        <TextView
-            android:id="@+id/food_row_name"
-            android:layout_width="wrap_content"
+        android:layout_marginVertical="12dp">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:text="@string/element"/>
-        <TextView
-            android:id="@+id/food_row_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:text="@string/element"/>
-        <TextView
-            android:id="@+id/food_row_min_pet_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:text="@string/element"/>
-        <TextView
-            android:id="@+id/food_row_min_feed_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:text="@string/element"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_marginVertical="10dp"
+            tools:ignore="UselessParent">
+            <TextView
+                android:id="@+id/food_row_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="@string/element"/>
+            <TextView
+                android:id="@+id/food_row_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="@string/element"/>
+            <TextView
+                android:id="@+id/food_row_min_pet_weight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="@string/element"/>
+            <TextView
+                android:id="@+id/food_row_min_feed_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="@string/element"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </FrameLayout>

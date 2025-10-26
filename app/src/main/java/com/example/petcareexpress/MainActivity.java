@@ -13,8 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,7 +24,6 @@ import com.example.petcareexpress.objects.FoodData;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private static final String BUTTON_TAG = "Buttons";
     private ActivityResultLauncher<Intent> getFoodItemActivity;
     private DBHelper dbHelper;
     EditText inputPetWeightText, inputMealAmount;
@@ -121,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         // Add onClick Listeners
         selectFoodButton.setOnClickListener(v -> {
             // showShortToast("Feature: 'Select Food' not implemented yet.");
-            // new SelectItemDialog().show(getSupportFragmentManager(), "SELECT_ITEM");
 
             Intent intent = new Intent(MainActivity.this, SelectItemActivity.class);
             getFoodItemActivity.launch(intent);

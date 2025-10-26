@@ -25,7 +25,7 @@ public class AddItemDialog extends DialogFragment {
 
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View addItemView = View.inflate(getActivity(), R.layout.additem_dialog, null);
+        View addItemView = View.inflate(getActivity(), R.layout.activity_add_item, null);
         // Get ItemViews
         // EditTexts
         final EditText petFoodBrandInput = addItemView.findViewById(R.id.pet_food_brand_input);
