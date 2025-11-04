@@ -11,6 +11,7 @@ public class FoodData implements Parcelable {
     public double minimumPetWeight;
     public double minimumFeedingAmount;
     public double recommendedServing;
+    private boolean isSelected = false;
     public FoodData(String name, String foodType, double minimumPetWeight, double minimumFeedingAmount) {
         this.name = name;
         this.foodType = foodType;
@@ -55,5 +56,11 @@ public class FoodData implements Parcelable {
         dest.writeDouble(minimumPetWeight);
         dest.writeDouble(minimumFeedingAmount);
         dest.writeDouble(recommendedServing);
+    }
+    public boolean isSelected() {
+        return isSelected;
+    }
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

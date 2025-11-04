@@ -68,8 +68,13 @@ public class MainActivity extends AppCompatActivity {
                     if (result.getResultCode() == MainActivity.RESULT_OK) {
                         Intent data = result.getData();
                         assert data != null;
+
                         foodData = data.getParcelableExtra("selectedFoodData");
-                        // TODO: Parse to FoodData.
+                        assert foodData != null;
+
+                        setFoodDataDisplayText(foodData.name, foodData.foodType);
+                        setServingWeightOutput(inputPetWeightText.getText().toString());
+                        setMealWeightText(inputMealAmount.getText().toString());
                     } else if (result.getResultCode() == MainActivity.RESULT_CANCELED) {
                         showShortToast("No item selected.");
                     }
@@ -128,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize default values
         foodData = constructFoodFormula();
-        petFoodBrandText.setText(foodData.name);
-        petFoodTypeText.setText(foodData.foodType);
+        setFoodDataDisplayText(foodData.name, foodData.foodType);
         setServingWeightOutput(inputPetWeightText.getText().toString());
         setMealWeightText(inputMealAmount.getText().toString());
 
@@ -137,6 +141,10 @@ public class MainActivity extends AppCompatActivity {
     }
     public void showShortToast(String string) {
         Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
+    }
+    private void setFoodDataDisplayText(String foodName, String foodType) {
+        petFoodBrandText.setText(foodName);
+        petFoodTypeText.setText(foodType);
     }
     private void setMealWeightText(String textValue) {
         double doubleValue = Double.parseDouble(textValue);

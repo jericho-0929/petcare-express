@@ -57,7 +57,14 @@ public class AddItemDialog extends DialogFragment {
             double minimumPetWeight = Double.parseDouble(minimumPetWeightInput.getText().toString());
             double minimumFeedAmount = Double.parseDouble(minimumFeedAmountInput.getText().toString());
 
-            if (insertRow(petFoodBrand, petFoodType.toString(), minimumPetWeight, minimumFeedAmount)) {
+            // TODO: Add handling for overwriting existing entry (based only on name).
+            if (checkIfRowExists(petFoodBrand)) {
+                showUpdateDialog(petFoodBrand, petFoodType.toString(), minimumPetWeight, minimumFeedAmount);
+
+                dbHelper.close();
+                dialog.dismiss();
+            }
+            else if (insertRow(petFoodBrand, petFoodType.toString(), minimumPetWeight, minimumFeedAmount)) {
                 showShortToast("Added entry for: " + petFoodBrand);
 
                 dbHelper.close();
@@ -96,6 +103,44 @@ public class AddItemDialog extends DialogFragment {
             return false;
         }
         return true;
+    }
+    private boolean checkIfRowExists(String petFoodName) {
+        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(
+                DBContract.FoodTable.TABLE_NAME,
+                new String[] {DBContract.FoodTable.COLUMN_ID}, // Not used.
+                DBContract.FoodTable.COLUMN_BRAND_NAME + "=?",
+                new String[] {petFoodName},
+                null,
+                null,
+                null
+        );
+
+        boolean returnBool = cursor.moveToFirst();
+
+        cursor.close();
+        db.close();
+
+        return returnBool;
+    }
+    private void updateRow(String petFoodBrand, String petFoodType, double minimumPetWeight, double minimumFeedAmount) {
+        // TODO: Implement.
+    }
+    private void showUpdateDialog(String petFoodBrand, String petFoodType, double minimumPetWeight, double minimumFeedAmount) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        builder.setTitle("Update Item");
+        builder.setMessage("Food item already exists! Update instead?");
+        builder.setPositiveButton("Yes", (dialog, id) -> {
+           Toast.makeText(getContext(), "Updated item: " + petFoodBrand, Toast.LENGTH_SHORT).show();
+           dialog.dismiss();
+        });
+        builder.setNegativeButton("No", (dialog, id) -> {
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
     public void onDismiss(@NonNull DialogInterface dialog){
         Log.d(TAG, "Dialog dismissed.");

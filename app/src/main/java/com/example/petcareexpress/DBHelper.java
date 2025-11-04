@@ -12,7 +12,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "petcare.db";
     private static final String SQL_CREATE_INVENTORY_TABLE =
             "CREATE TABLE IF NOT EXISTS " + DBContract.FoodTable.TABLE_NAME + " (" +
-                    DBContract.FoodTable.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    DBContract.FoodTable.COLUMN_ID + " INTEGER PRIMARY KEY, " + // Autoincrement not needed, reusing deleted indices is preferred.
                     DBContract.FoodTable.COLUMN_BRAND_NAME + " TEXT NOT NULL, " +
                     DBContract.FoodTable.COLUMN_FOOD_TYPE + " TEXT NOT NULL, " +
                     DBContract.FoodTable.COLUMN_MIN_PET_WEIGHT + " REAL NOT NULL, " +
