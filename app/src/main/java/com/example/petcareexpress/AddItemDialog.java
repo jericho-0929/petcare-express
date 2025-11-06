@@ -3,6 +3,7 @@ package com.example.petcareexpress;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AddItemDialog extends DialogFragment {
     private final String TAG = "Add Item Dialog";
     private DBHelper dbHelper;
-    private Cursor dbCursor;
+    private Context context;
 
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class AddItemDialog extends DialogFragment {
 
         // TODO: Change to use MainActivity's dbHelper.
         dbHelper = new DBHelper(getContext());
+        context = getContext();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Add Food Item");
@@ -80,12 +82,10 @@ public class AddItemDialog extends DialogFragment {
         return builder.create();
     }
     private void showShortToast(String string) {
-        if (getActivity() != null) {
-            Toast.makeText(getActivity(), string, Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(context, string, Toast.LENGTH_SHORT).show();
     }
     private boolean insertRow(String petFoodBrand, String petFoodType, double minimumPetWeight, double minimumFeedAmount) {
-        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues insertionRow = new ContentValues();
         insertionRow.put(DBContract.FoodTable.COLUMN_BRAND_NAME, petFoodBrand);
@@ -105,7 +105,7 @@ public class AddItemDialog extends DialogFragment {
         return true;
     }
     private boolean checkIfRowExists(String petFoodName) {
-        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(
                 DBContract.FoodTable.TABLE_NAME,
                 new String[] {DBContract.FoodTable.COLUMN_ID}, // Not used.
@@ -123,16 +123,36 @@ public class AddItemDialog extends DialogFragment {
 
         return returnBool;
     }
-    private void updateRow(String petFoodBrand, String petFoodType, double minimumPetWeight, double minimumFeedAmount) {
-        // TODO: Implement.
+    private int updateRow(String petFoodBrand, String petFoodType, double minimumPetWeight, double minimumFeedAmount) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBContract.FoodTable.COLUMN_FOOD_TYPE, petFoodType);
+        contentValues.put(DBContract.FoodTable.COLUMN_MIN_PET_WEIGHT, minimumPetWeight);
+        contentValues.put(DBContract.FoodTable.COLUMN_MIN_FEED_AMOUNT, minimumFeedAmount);
+
+        int rowsAffected = db.update(
+                DBContract.FoodTable.TABLE_NAME,
+                contentValues,
+                DBContract.FoodTable.COLUMN_BRAND_NAME + "=?",
+                new String[] {petFoodBrand}
+        );
+
+        db.close();
+
+        return rowsAffected;
     }
     private void showUpdateDialog(String petFoodBrand, String petFoodType, double minimumPetWeight, double minimumFeedAmount) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         builder.setTitle("Update Item");
-        builder.setMessage("Food item already exists! Update instead?");
+        builder.setMessage(petFoodBrand + " already exists! Update instead?");
         builder.setPositiveButton("Yes", (dialog, id) -> {
-           Toast.makeText(getContext(), "Updated item: " + petFoodBrand, Toast.LENGTH_SHORT).show();
+           if (updateRow(petFoodBrand, petFoodType, minimumPetWeight, minimumFeedAmount) > 0) {
+               showShortToast("Updated item: " + petFoodBrand);
+           } else {
+               showShortToast("Error: Item not found!");
+           }
            dialog.dismiss();
         });
         builder.setNegativeButton("No", (dialog, id) -> {
