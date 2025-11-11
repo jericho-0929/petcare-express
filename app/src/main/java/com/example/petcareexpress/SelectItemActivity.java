@@ -102,7 +102,6 @@ public class SelectItemActivity extends AppCompatActivity {
     private void deleteItemFromSQLite(String foodName) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Delete from SQLite table.
         db.delete(DBContract.FoodTable.TABLE_NAME, DBContract.FoodTable.COLUMN_BRAND_NAME + "=?", new String[] {foodName});
         db.close();
 

@@ -56,24 +56,25 @@ public class AddItemDialog extends DialogFragment {
 
         builder.setPositiveButton("Add Item", (dialog, id) -> {
             String petFoodBrand = petFoodBrandInput.getText().toString();
-            double minimumPetWeight = Double.parseDouble(minimumPetWeightInput.getText().toString());
-            double minimumFeedAmount = Double.parseDouble(minimumFeedAmountInput.getText().toString());
+            String minimumPetWeight = minimumPetWeightInput.getText().toString();
+            String minimumFeedAmount = minimumFeedAmountInput.getText().toString();
 
-            // TODO: Add handling for overwriting existing entry (based only on name).
-            if (checkIfRowExists(petFoodBrand)) {
-                showUpdateDialog(petFoodBrand, petFoodType.toString(), minimumPetWeight, minimumFeedAmount);
+            if (!petFoodBrand.isEmpty() && !petFoodType.toString().isEmpty() && !minimumPetWeight.isEmpty() && !minimumFeedAmount.isEmpty()) {
+                if (checkIfRowExists(petFoodBrand)) {
+                    showUpdateDialog(petFoodBrand, petFoodType.toString(), Double.parseDouble(minimumPetWeight), Double.parseDouble(minimumFeedAmount));
+                }
+                else if (insertRow(petFoodBrand, petFoodType.toString(), Double.parseDouble(minimumPetWeight), Double.parseDouble(minimumFeedAmount))) {
+                    showShortToast("Added entry for: " + petFoodBrand);
+                } else {
+                    showShortToast("Add entry failed.");
+                }
 
                 dbHelper.close();
                 dialog.dismiss();
             }
-            else if (insertRow(petFoodBrand, petFoodType.toString(), minimumPetWeight, minimumFeedAmount)) {
-                showShortToast("Added entry for: " + petFoodBrand);
 
-                dbHelper.close();
-                dialog.dismiss();
-            } else {
-                showShortToast("Add entry failed.");
-            }
+            // Should only fire if the preceding if-statement is not triggered.
+            showShortToast("One or more entries are empty!");
         })
         .setNegativeButton("Cancel", (dialog, id) -> {
            showShortToast("Canceled.");

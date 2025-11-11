@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     Button selectFoodButton, addItemButton;
     FoodData foodData;
     double servingWeight = 0;
-    Cursor dbCursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Activity Initialization
@@ -44,24 +43,20 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        // Initialize DBHelper
+
         dbHelper = new DBHelper(this);
-        // Assign variables to equivalent in UI
+
         petWeightText = findViewById(R.id.pet_weight);
         petFoodBrandText = findViewById(R.id.pet_food_brand);
         petFoodTypeText = findViewById(R.id.pet_food_type);
         mealWeightText = findViewById(R.id.meal_per_day_amount);
-        // User-input guide UI elements
         inputPetWeightText = findViewById(R.id.input_pet_weight);
         inputMealAmount = findViewById(R.id.input_meal_amount);
-        // Output-to-user UI elements
         servingWeightOutput = findViewById(R.id.serving_weight);
         servingPerMealOutput = findViewById(R.id.serving_per_meal);
-        // Buttons
         selectFoodButton = findViewById(R.id.select_food_button);
         addItemButton = findViewById(R.id.add_item_button);
 
-        // Initialize ActivityResultLaunchers
         getFoodItemActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -80,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        // Add TextChange Listeners
         inputPetWeightText.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 Log.v(TAG, "inputPetWeightWatcher stand-by.");
@@ -120,10 +114,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.v(TAG, "inputMealAmountWatcher receiving input.");
                 }
             });
-        // Add onClick Listeners
-        selectFoodButton.setOnClickListener(v -> {
-            // showShortToast("Feature: 'Select Food' not implemented yet.");
 
+        selectFoodButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SelectItemActivity.class);
             getFoodItemActivity.launch(intent);
         });
@@ -131,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
             new AddItemDialog().show(getSupportFragmentManager(), "ADD_ITEM");
         });
 
-        // Initialize default values
         foodData = constructFoodFormula();
         setFoodDataDisplayText(foodData.name, foodData.foodType);
         setServingWeightOutput(inputPetWeightText.getText().toString());
@@ -162,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private FoodData constructFoodFormula() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+
         Cursor cursor = db.query(
                 DBContract.FoodTable.TABLE_NAME,
                 null,
@@ -171,9 +163,9 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 null
         );
-        // Get first entry in foodDatabase.
+
         cursor.moveToFirst();
-        // Initialize classes
+
         FoodData foodData = new FoodData(
                 cursor.getString(cursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_BRAND_NAME)),
                 cursor.getString(cursor.getColumnIndexOrThrow(DBContract.FoodTable.COLUMN_FOOD_TYPE)),
